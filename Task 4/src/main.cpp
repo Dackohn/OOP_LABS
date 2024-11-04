@@ -46,6 +46,16 @@ private:
         return ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u';
     }
 
+    string removePunctuation(const string& word) {
+        string cleanedWord;
+        for (char ch : word) {
+            if (isalpha(ch)) {
+                cleanedWord += ch;
+            }
+        }
+        return cleanedWord;
+    }
+
 public:
     TextData(const string& textContent) : text(textContent), numberOfVowels(0), numberOfConsonants(0),
                                           numberOfLetters(0), numberOfSentences(0) {
@@ -56,10 +66,11 @@ public:
         stringstream stream(text);
         string word;
         while (stream >> word) {
-            if (word.length() > longestWord.length()) {
-                longestWord = word;
+            string cleanedWord = removePunctuation(word);
+            if (cleanedWord.length() > longestWord.length()) {
+                longestWord = cleanedWord;
             }
-            for (char ch : word) {
+            for (char ch : cleanedWord) {
                 if (isalpha(ch)) {
                     numberOfLetters++;
                     if (isVowel(ch)) {
