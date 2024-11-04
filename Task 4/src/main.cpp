@@ -4,11 +4,36 @@
 #include <cctype>
 #include <sstream>
 #include <vector>
+
 using namespace std;
+
+class FileReader {
+private:
+    string filename;
+
+public:
+    FileReader(const string& filePath) : filename(filePath) {}
+
+    string readFileContent() {
+        ifstream file(filename);
+        if (!file.is_open()) {
+            cerr << "Failed to open the file: " << filename << endl;
+            return "";
+        }
+
+        stringstream buffer;
+        buffer << file.rdbuf();
+        file.close();
+        return buffer.str();
+    }
+
+    string getFilename() const {
+        return filename;
+    }
+};
 
 class TextData {
 private:
-    string fileName;
     string text;
     int numberOfVowels;
     int numberOfConsonants;
@@ -22,18 +47,9 @@ private:
     }
 
 public:
-    TextData(const string& filePath) : fileName(filePath), numberOfVowels(0), numberOfConsonants(0),
-                                       numberOfLetters(0), numberOfSentences(0) {
-        ifstream file(filePath);
-        if (file.is_open()) {
-            stringstream buffer;
-            buffer << file.rdbuf();
-            text = buffer.str();
-            file.close();
-            processText();
-        } else {
-            cerr << "Failed to open the file: " << filePath << endl;
-        }
+    TextData(const string& textContent) : text(textContent), numberOfVowels(0), numberOfConsonants(0),
+                                          numberOfLetters(0), numberOfSentences(0) {
+        processText();
     }
 
     void processText() {
@@ -61,35 +77,32 @@ public:
         }
     }
 
-    string getFilename() const { return fileName; }
-    string getText() const { return text; }
-    int getNumberOfVowels() const { return numberOfVowels; }
-    int getNumberOfConsonants() const { return numberOfConsonants; }
-    int getNumberOfLetters() const { return numberOfLetters; }
-    int getNumberOfSentences() const { return numberOfSentences; }
-    string getLongestWord() const { return longestWord; }
-    
-    void printInfo() const {
-        cout << "File Name: " << getFilename() << endl;
-        cout << "Text Content: " << getText() << endl;
-        cout << "Number of Vowels: " << getNumberOfVowels() << endl;
-        cout << "Number of Consonants: " << getNumberOfConsonants() << endl;
-        cout << "Number of Letters: " << getNumberOfLetters() << endl;
-        cout << "Number of Sentences: " << getNumberOfSentences() << endl;
-        cout << "Longest Word: " << getLongestWord() << endl;
+    void printInfo(const string& fileName) const {
+        cout << "File Name: " << fileName << endl;
+        cout << "Text Content: " << text << endl;
+        cout << "Number of Vowels: " << numberOfVowels << endl;
+        cout << "Number of Consonants: " << numberOfConsonants << endl;
+        cout << "Number of Letters: " << numberOfLetters << endl;
+        cout << "Number of Sentences: " << numberOfSentences << endl;
+        cout << "Longest Word: " << longestWord << endl;
         cout << "----------------------------------------" << endl;
     }
 };
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        cerr << "Please provide at least one .txt file as a argument." << endl;
+        cerr << "Please provide at least one .txt file as an argument." << endl;
         return 1;
     }
 
     for (int i = 1; i < argc; ++i) {
-        TextData textData(argv[i]);
-        textData.printInfo();
+        FileReader fileReader(argv[i]);
+        string fileContent = fileReader.readFileContent();
+
+        if (!fileContent.empty()) {
+            TextData textData(fileContent);
+            textData.printInfo(fileReader.getFilename());
+        }
     }
 
     return 0;
