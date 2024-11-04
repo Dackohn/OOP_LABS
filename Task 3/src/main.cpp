@@ -45,22 +45,33 @@ public:
     }
 
     void buyDisplay() {
-        if (assignedDisplays.empty()) {
-            cout << "No displays assigned to buy." << endl;
-            return;
+        while (!assignedDisplays.empty()) {
+            int choice;
+            cout << "\nEnter the number of the display you want to buy (or 0 to quit): ";
+            cin >> choice;
+
+            if (choice == 0) {
+                cout << "Exiting buy display process." << endl;
+                break;
+            }
+
+            if (choice < 1 || choice > assignedDisplays.size()) {
+                cout << "Invalid choice. Please select a valid display number." << endl;
+                continue;
+            }
+
+            Display chosenDisplay = assignedDisplays[choice - 1];
+            cout << "You chose to buy the display: " << chosenDisplay.getModel() << endl;
+
+            assignedDisplays.erase(assignedDisplays.begin() + choice - 1);
+            cout << "Display removed from the list.\n";
+
+            if (assignedDisplays.empty()) {
+                cout << "No more displays left to buy." << endl;
+            } else {
+                assist(); // Show remaining displays
+            }
         }
-
-        int choice;
-        cout << "Enter the number of the display you want to buy: ";
-        cin >> choice;
-
-        if (choice < 1 || choice > assignedDisplays.size()) {
-            cout << "Invalid choice. Please select a valid display number." << endl;
-            return;
-        }
-
-        Display chosenDisplay = assignedDisplays[choice - 1];
-        cout << "You chose to buy the display: " << chosenDisplay.getModel() << endl;
     }
 };
 
